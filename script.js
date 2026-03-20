@@ -78,6 +78,24 @@ const enemyLayout = [
   { id: "enemy-townhall", name: "Enemy Town Hall", health: 520, damage: 0, range: 0, cooldown: 0, x: 282 },
 ];
 
+const raidTemplates = [
+  [
+    { id: "enemy-archer", name: "Enemy Archer Tower", health: 170, damage: 10, range: 220, cooldown: 950, x: 74 },
+    { id: "enemy-wizard", name: "Enemy Wizard Tower", health: 210, damage: 15, range: 180, cooldown: 1250, x: 170 },
+    { id: "enemy-townhall", name: "Enemy Town Hall", health: 520, damage: 0, range: 0, cooldown: 0, x: 282 },
+  ],
+  [
+    { id: "enemy-cannon", name: "Enemy Cannon", health: 190, damage: 14, range: 160, cooldown: 850, x: 88 },
+    { id: "enemy-archer-2", name: "Enemy Archer Tower", health: 165, damage: 11, range: 220, cooldown: 900, x: 176 },
+    { id: "enemy-townhall", name: "Enemy Town Hall", health: 560, damage: 0, range: 0, cooldown: 0, x: 286 },
+  ],
+  [
+    { id: "enemy-wizard-2", name: "Enemy Wizard Tower", health: 220, damage: 18, range: 180, cooldown: 1200, x: 104 },
+    { id: "enemy-mortar", name: "Enemy Mortar", health: 240, damage: 22, range: 210, cooldown: 1450, x: 196 },
+    { id: "enemy-townhall", name: "Enemy Town Hall", health: 600, damage: 0, range: 0, cooldown: 0, x: 292 },
+  ],
+];
+
 const troopTypes = [
   {
     id: "archer",
@@ -195,6 +213,7 @@ const state = {
     currentHealth: defense.health,
     cooldownLeft: 0,
   })),
+  raidActive: false,
   lastTick: performance.now(),
   gameOver: false,
   villageDirty: true,
@@ -213,6 +232,7 @@ const battleLane = document.getElementById("battleLane");
 const battleMessage = document.getElementById("battleMessage");
 const troopRoster = document.getElementById("troopRoster");
 const heroRoster = document.getElementById("heroRoster");
+const attackButton = document.getElementById("attackButton");
 const deployTroopButton = document.getElementById("deployTroopButton");
 const selectionHint = document.getElementById("selectionHint");
 
@@ -239,6 +259,20 @@ function getSelectedUnitCount() {
 function getTotalTroops() {
   return Object.values(state.troops).reduce((sum, count) => sum + count, 0)
     + Object.values(state.heroes).reduce((sum, count) => sum + count, 0);
+}
+
+function createRandomBase() {
+  const template = raidTemplates[Math.floor(Math.random() * raidTemplates.length)];
+  return template.map((defense) => {
+    const variance = defense.id === "enemy-townhall" ? 80 : 35;
+    const bonusHealth = Math.floor(Math.random() * variance);
+    return {
+      ...defense,
+      health: defense.health + bonusHealth,
+      currentHealth: defense.health + bonusHealth,
+      cooldownLeft: 0,
+    };
+  });
 }
 
 function canAfford(building) {
@@ -463,7 +497,8 @@ function renderButtons() {
       button.disabled = !hasHeroHall || state.elixir < hero.cost || state.gameOver;
     }
   });
-  deployTroopButton.disabled = getSelectedUnitCount() <= 0 || state.gameOver;
+  attackButton.disabled = state.gameOver;
+  deployTroopButton.disabled = !state.raidActive || getSelectedUnitCount() <= 0 || state.gameOver;
   deployTroopButton.textContent = `Deploy ${getSelectedUnitType().name}`;
 }
 
@@ -594,6 +629,11 @@ function deployTroop() {
     return;
   }
 
+  if (!state.raidActive) {
+    setMessage("Press Attack to raid a random base first.");
+    return;
+  }
+
   const unit = getSelectedUnitType();
   if (getSelectedUnitCount() <= 0) {
     setMessage(`Train ${unit.name} first.`);
@@ -609,7 +649,7 @@ function deployTroop() {
 
 function spawnTroop() {
   const unitType = getSelectedUnitType();
-  if (getSelectedUnitCount() <= 0 || state.gameOver) {
+  if (!state.raidActive || getSelectedUnitCount() <= 0 || state.gameOver) {
     return;
   }
 
@@ -760,14 +800,29 @@ function checkVictory() {
   const enemyTownHall = state.enemyDefenses.find((building) => building.id === "enemy-townhall");
   const ownTownHall = state.placedBuildings.find((building) => building.type.id === "townhall");
 
-  if (enemyTownHall.currentHealth <= 0 && !state.gameOver) {
-    state.gameOver = true;
+  if (enemyTownHall.currentHealth <= 0 && state.raidActive && !state.gameOver) {
+    state.raidActive = false;
     state.deployMode = false;
     state.shopDirty = true;
-    setMessage("Victory. The enemy Town Hall has fallen.");
+    state.battleTroops = [];
+    setMessage("Victory. The enemy Town Hall has fallen. Press Attack for a new random base.");
   } else if (!ownTownHall && !state.gameOver) {
     setMessage("You do not have a Town Hall yet. Build one to secure your village.");
   }
+}
+
+function startAttack() {
+  if (state.gameOver) {
+    return;
+  }
+
+  state.enemyDefenses = createRandomBase();
+  state.battleTroops = [];
+  state.deployMode = false;
+  state.raidActive = true;
+  state.shopDirty = true;
+  setMessage("A random enemy base was found. Deploy your units.");
+  render();
 }
 
 function gameLoop(timestamp) {
@@ -776,9 +831,11 @@ function gameLoop(timestamp) {
 
   if (!state.gameOver) {
     updateResourceGeneration(deltaMs);
-    updateTroops(deltaMs);
-    updateEnemyDefenses(deltaMs);
-    updatePlayerDefenses(deltaMs);
+    if (state.raidActive) {
+      updateTroops(deltaMs);
+      updateEnemyDefenses(deltaMs);
+      updatePlayerDefenses(deltaMs);
+    }
     cleanupDestroyedBuildings();
     checkVictory();
   }
@@ -787,6 +844,7 @@ function gameLoop(timestamp) {
   requestAnimationFrame(gameLoop);
 }
 
+attackButton.addEventListener("click", startAttack);
 deployTroopButton.addEventListener("click", deployTroop);
 battleLane.addEventListener("click", () => {
   if (state.deployMode) {
