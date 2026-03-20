@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini Clash Village</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="panel hero-panel">
+        <p class="eyebrow">Village Command</p>
+        <h1>Mini Clash Village</h1>
+        <p class="intro">
+          Build your base, gather gold and elixir, then deploy troops on the enemy side to break through defenses.
+        </p>
+      </div>
+
+      <div class="panel resources-panel">
+        <h2>Resources</h2>
+        <div class="resource-grid">
+          <div class="resource-card gold">
+            <span class="label">Gold</span>
+            <strong id="goldValue">0</strong>
+          </div>
+          <div class="resource-card elixir">
+            <span class="label">Elixir</span>
+            <strong id="elixirValue">0</strong>
+          </div>
+          <div class="resource-card">
+            <span class="label">Troops</span>
+            <strong id="troopValue">0</strong>
+          </div>
+          <div class="resource-card">
+            <span class="label">Enemy Base</span>
+            <strong id="enemyHealthValue">0</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="section-head">
+          <h2>Build</h2>
+          <p>Click a building, then place it on an empty tile in your village.</p>
+        </div>
+        <div class="shop-grid" id="buildingShop"></div>
+      </div>
+
+      <div class="panel">
+        <div class="section-head">
+          <h2>Troops</h2>
+          <p>Train troops from barracks, then choose which unit to deploy into the battle lane.</p>
+        </div>
+        <div id="troopRoster" class="troop-roster"></div>
+        <div class="section-head">
+          <h2>Heroes</h2>
+          <p>Build a Hero Hall to unlock Barbarian King, Archer Queen, and Boss Bandit.</p>
+        </div>
+        <div id="heroRoster" class="troop-roster"></div>
+        <button id="deployTroopButton" class="action-button accent">Deploy Selected Unit</button>
+        <p class="hint" id="selectionHint">No building selected.</p>
+      </div>
+
+      <div class="panel">
+        <h2>How To Play</h2>
+        <ul class="rules">
+          <li>Buy a Town Hall first to anchor your village.</li>
+          <li>Gold Mines and Elixir Collectors generate resources over time.</li>
+          <li>Archer Towers and Wizard Towers defend your side of the lane.</li>
+          <li>Barracks are required before you can train troops.</li>
+          <li>Hero Hall is required before you can train heroes.</li>
+          <li>Deploy enough troops to destroy the enemy Town Hall.</li>
+        </ul>
+      </div>
+    </aside>
+
+    <main class="main-stage">
+      <section class="panel village-panel">
+        <div class="section-head">
+          <h2>Your Village</h2>
+          <p>Click an empty tile to place the selected building.</p>
+        </div>
+        <div id="villageGrid" class="village-grid"></div>
+      </section>
+
+      <section class="panel battlefield-panel">
+        <div class="section-head">
+          <h2>Battle Lane</h2>
+          <p>Player troops move left to right. Enemy defenses hold the front.</p>
+        </div>
+        <div class="battlefield">
+          <div class="battle-side player-side">
+            <h3>Your Defenses</h3>
+            <div id="playerDefenseLane" class="lane defense-lane"></div>
+          </div>
+          <div class="battle-center">
+            <div id="battleMessage" class="battle-message">Train troops and deploy them to attack.</div>
+            <div id="battleLane" class="lane battle-lane"></div>
+          </div>
+          <div class="battle-side enemy-side">
+            <h3>Enemy Base</h3>
+            <div id="enemyDefenseLane" class="lane defense-lane"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+</html>
