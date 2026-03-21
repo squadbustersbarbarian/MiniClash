@@ -98,6 +98,18 @@ const raidTemplates = [
 
 const troopTypes = [
   {
+    id: "barbarian",
+    name: "Barbarian",
+    cost: 60,
+    health: 110,
+    damage: 20,
+    speed: 42,
+    range: 28,
+    attackCooldown: 750,
+    lootBonus: 1,
+    description: "Balanced melee fighter for early raids.",
+  },
+  {
     id: "archer",
     name: "Archer",
     cost: 70,
@@ -190,6 +202,7 @@ const state = {
   gold: 480,
   elixir: 260,
   troops: {
+    barbarian: 0,
     archer: 0,
     goblin: 0,
     hogrider: 0,
@@ -201,7 +214,7 @@ const state = {
     bossbandit: 0,
   },
   selectedUnitGroup: "troop",
-  selectedTroop: "archer",
+  selectedTroop: "barbarian",
   selectedHero: "barbarianking",
   selectedBuilding: null,
   deployMode: false,
@@ -805,7 +818,9 @@ function checkVictory() {
     state.deployMode = false;
     state.shopDirty = true;
     state.battleTroops = [];
-    setMessage("Victory. The enemy Town Hall has fallen. Press Attack for a new random base.");
+    state.gold += 500;
+    state.elixir += 500;
+    setMessage("Victory. The enemy Town Hall has fallen. You gained 500 gold and 500 elixir.");
   } else if (!ownTownHall && !state.gameOver) {
     setMessage("You do not have a Town Hall yet. Build one to secure your village.");
   }
