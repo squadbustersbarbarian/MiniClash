@@ -157,6 +157,30 @@ const troopTypes = [
     lootBonus: 1,
     description: "Slow but strong flying unit.",
   },
+  {
+    id: "rootrider",
+    name: "Root Rider",
+    cost: 190,
+    health: 300,
+    damage: 40,
+    speed: 34,
+    range: 34,
+    attackCooldown: 1050,
+    lootBonus: 1,
+    description: "Heavy bruiser that pushes forward with huge health.",
+  },
+  {
+    id: "ramrider",
+    name: "Ram Rider",
+    cost: 180,
+    health: 210,
+    damage: 34,
+    speed: 64,
+    range: 32,
+    attackCooldown: 780,
+    lootBonus: 1,
+    description: "Fast mounted attacker that slams into defenses.",
+  },
 ];
 
 const heroTypes = [
@@ -207,6 +231,8 @@ const state = {
     goblin: 0,
     hogrider: 0,
     dragon: 0,
+    rootrider: 0,
+    ramrider: 0,
   },
   heroes: {
     barbarianking: 0,
