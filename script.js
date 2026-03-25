@@ -146,6 +146,30 @@ const troopTypes = [
     description: "Heavy hitter that charges defenses.",
   },
   {
+    id: "rootrider",
+    name: "Root Rider",
+    cost: 145,
+    health: 225,
+    damage: 34,
+    speed: 38,
+    range: 30,
+    attackCooldown: 950,
+    lootBonus: 2,
+    description: "Bulky siege troop that crushes walls and pulls extra loot.",
+  },
+  {
+    id: "ramrider",
+    name: "Ram Rider",
+    cost: 135,
+    health: 185,
+    damage: 30,
+    speed: 58,
+    range: 34,
+    attackCooldown: 780,
+    lootBonus: 1,
+    description: "Fast mounted raider that slams into defenses ahead of the pack.",
+  },
+  {
     id: "dragon",
     name: "Dragon",
     cost: 160,
@@ -156,30 +180,6 @@ const troopTypes = [
     attackCooldown: 1200,
     lootBonus: 1,
     description: "Slow but strong flying unit.",
-  },
-  {
-    id: "rootrider",
-    name: "Root Rider",
-    cost: 190,
-    health: 300,
-    damage: 40,
-    speed: 34,
-    range: 34,
-    attackCooldown: 1050,
-    lootBonus: 1,
-    description: "Heavy bruiser that pushes forward with huge health.",
-  },
-  {
-    id: "ramrider",
-    name: "Ram Rider",
-    cost: 180,
-    health: 210,
-    damage: 34,
-    speed: 64,
-    range: 32,
-    attackCooldown: 780,
-    lootBonus: 1,
-    description: "Fast mounted attacker that slams into defenses.",
   },
 ];
 
@@ -220,7 +220,23 @@ const heroTypes = [
     lootBonus: 3,
     description: "Concept hero that charges fast and steals huge loot.",
   },
+  {
+    id: "dragonduke",
+    name: "Dragon Duke",
+    cost: 320,
+    health: 320,
+    damage: 54,
+    speed: 52,
+    range: 150,
+    attackCooldown: 820,
+    lootBonus: 2,
+    description: "Flying hero with high burst damage and strong raid pressure.",
+  },
 ];
+
+const buildingImages = {
+  townhall: "./images/town%20hall.png",
+};
 
 const state = {
   gold: 480,
@@ -230,14 +246,15 @@ const state = {
     archer: 0,
     goblin: 0,
     hogrider: 0,
-    dragon: 0,
     rootrider: 0,
     ramrider: 0,
+    dragon: 0,
   },
   heroes: {
     barbarianking: 0,
     archerqueen: 0,
     bossbandit: 0,
+    dragonduke: 0,
   },
   selectedUnitGroup: "troop",
   selectedTroop: "barbarian",
@@ -455,8 +472,12 @@ function renderVillage() {
 
     if (tile.building) {
       const building = tile.building;
+      const imageMarkup = buildingImages[building.type.id]
+        ? `<img class="building-image" src="${buildingImages[building.type.id]}" alt="${building.type.name}">`
+        : "";
       tileButton.innerHTML = `
         <div class="building-card building-${building.type.id}">
+          ${imageMarkup}
           <span class="building-name">${building.type.name}</span>
           <span class="building-health">HP ${Math.max(0, Math.ceil(building.currentHealth))}</span>
         </div>
